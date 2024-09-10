@@ -1,4 +1,4 @@
-const { select, input } = require('@inquirer/prompts');
+const { select, input, checkbox } = require('@inquirer/prompts');
 
 // objeto estrutural da meta
 let meta = {
@@ -25,16 +25,42 @@ const cadastrarMeta = async () => {
 
 // lista as metas
 const listarMeta = async () => {
-    const meta = await input({ message: "Digite a meta: " });
+
+    //caso o usuário tente listar as metas sem cadastrar antes
+    if (metas.length == 0) {
+        console.error("Nenhuma meta cadastrada!");
+        return;
+    }
     
-    if (meta.length == 0) {
-        console.error("A meta não pode ser vazia!");
+    // checkbox tb depende de mensagens e um array de respostas selecionadas.
+    const respostas = await checkbox({
+        message: "Use as ARROW KEYS para mudar de meta, o <SPACE> para marcar/desmarcar e o <ENTER> para finalizar a etapa \n",
+        choices: [...metas],
+        instructions: false,
+     });
+    
+    if (respostas.length == 0) {
+        console.error("Nenhuma meta selecionada!");
         return;
     }
 
-    metas.push(
-        {value: meta, checked: false}
-    )
+    // garante que todas fiquem desmarcadas na chamada de volta!
+    metas.forEach((m) => {
+        m.checked = false;
+    })
+
+    // vai percorrer a lista de respostas
+    respostas.forEach((resposta) => {
+        const meta = metas.find((m) => {
+            return m.value == resposta
+        })
+
+        // a meta só vai ficar como vERDADEIRA
+        //SE eu listar com os comandos
+        meta.checked = true;
+    });
+
+    console.log("Meta(s) concluída(s)");
 }
 
 const start = async () => {
@@ -68,7 +94,7 @@ const start = async () => {
                     break;
                 
                 case "listar":
-                    console.log("vamos listar");
+                    await listarMeta();
                     break;
                 
                 case "sair":
