@@ -1,4 +1,41 @@
-const { select } = require('@inquirer/prompts');
+const { select, input } = require('@inquirer/prompts');
+
+// objeto estrutural da meta
+let meta = {
+    value: 'Tomar 30L de café',
+    checked: false,
+};
+
+// array para guardar as metas
+let metas = [];
+
+// cadastra metas
+const cadastrarMeta = async () => {
+    const meta = await input({ message: "Digite a meta: " });
+    
+    if (meta.length == 0) {
+        console.error("A meta não pode ser vazia!");
+        return;
+    }
+
+    metas.push(
+        {value: meta, checked: false}
+    )
+}
+
+// lista as metas
+const listarMeta = async () => {
+    const meta = await input({ message: "Digite a meta: " });
+    
+    if (meta.length == 0) {
+        console.error("A meta não pode ser vazia!");
+        return;
+    }
+
+    metas.push(
+        {value: meta, checked: false}
+    )
+}
 
 const start = async () => {
 
@@ -25,11 +62,15 @@ const start = async () => {
         
             switch (opcionies) {
                 case "cadastrar":
-                    console.log("Lets cadastrar");
+                    // Precisa esperar meta ser cadastrada!
+                    await cadastrarMeta();
+                    console.log(metas);
                     break;
+                
                 case "listar":
                     console.log("vamos listar");
                     break;
+                
                 case "sair":
                     return;
                 
