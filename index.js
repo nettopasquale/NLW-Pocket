@@ -1,10 +1,16 @@
-let meta = {
-    value: 'Codar uma coisa por mês',
-    checked: false,
-    //imprime o argumento no console
-    log: (info) => {
-        console.log(info);
+const start = () => {
+    let opcionies = "";
+
+    switch (opcionies) {
+        case "cadastrar":
+            console.log("Lets cadastr");
+            break;
+        case "listar":
+            console.log("vamos listar");
+            break;
+        default:
+            console.error("Opção inválida :(");
     }
 }
 
-meta.log(meta.value);
+start()
