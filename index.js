@@ -6,6 +6,14 @@ let meta = {
     checked: false,
 };
 
+const verificaMetasCadastradas = () => {
+    //caso o usuário tente fazer qualquer coisa sem cadastrar tarefas!
+    if (metas.length == 0) {
+        console.error("Nenhuma meta cadastrada!");
+        return;
+    }
+}
+
 // array para guardar as metas
 let metas = [];
 
@@ -26,11 +34,7 @@ const cadastrarMeta = async () => {
 // lista as metas
 const listarMeta = async () => {
 
-    //caso o usuário tente listar as metas sem cadastrar antes
-    if (metas.length == 0) {
-        console.error("Nenhuma meta cadastrada!");
-        return;
-    }
+    verificaMetasCadastradas();
     
     // checkbox tb depende de mensagens e um array de respostas selecionadas.
     const respostas = await checkbox({
@@ -63,6 +67,29 @@ const listarMeta = async () => {
     console.log("Meta(s) concluída(s)");
 }
 
+// function paras as metas realizadas
+const metasRealizadas = async () => {
+
+    verificaMetasCadastradas();
+
+    // retornar apenas as metas com check de true
+    const realizadas = metas.filter((meta) => {
+        return meta.checked
+    })
+
+    if (realizadas.length == 0) {
+        console.error("Não existem metas realizadas!");
+        return;
+    }
+
+    await select({
+        message: "Metas realizadas",
+        choices: [...realizadas]
+    });
+
+    console.log(realizadas);
+}
+
 const start = async () => {
 
     // Que situação aqui seria falso?
@@ -80,6 +107,10 @@ const start = async () => {
                         value: "listar" 
                     },
                     {
+                        name: "metas realizadas", 
+                        value: "realizadas" 
+                    },
+                    {
                         name: "Sair",
                         value: "sair"
                     }
@@ -95,6 +126,10 @@ const start = async () => {
                 
                 case "listar":
                     await listarMeta();
+                    break;
+                
+                case "realizadas":
+                    await metasRealizadas();
                     break;
                 
                 case "sair":
