@@ -8,10 +8,15 @@ let meta = {
 
 const verificaMetasCadastradas = () => {
     //caso o usuário tente fazer qualquer coisa sem cadastrar tarefas!
-    if (metas.length == 0) {
-        console.error("Nenhuma meta cadastrada!");
-        return;
+    try {
+        if (metas.length == 0) {
+            console.error("Nenhuma meta cadastrada!");
+            return;
+        }
+    } catch (error) {
+        error.message("UIA!");
     }
+
 }
 
 // array para guardar as metas
@@ -90,6 +95,7 @@ const metasRealizadas = async () => {
     console.log(realizadas);
 }
 
+// function paras as metas em aberto
 const metasAbertas = async () => {
     verificaMetasCadastradas();
 
@@ -109,6 +115,40 @@ const metasAbertas = async () => {
     });
 
     console.log(abertas);
+}
+
+// function paras deletar metas
+const deletarMetas = async () => {
+    verificaMetasCadastradas();
+
+    // Eu quero criar uma nova lista APENAS com metas NÃO marcadas!
+    // map serve para criar uma nova lista com valores modificados!
+    const metasDesmarcadas = metas.map((meta) => {
+        // forçar que o checked fique em falso
+        // evitar que venha algum item marcado
+        return {value: meta.value, checked: false};
+    })
+
+    const itemsADeletar = await checkbox({
+        message: "Selecione um item para deletar \n",
+        choices: [...metasDesmarcadas],
+        instructions: false,
+    });
+
+    if (itemsADeletar == 0) {
+        console.error("Nenhum item para deletar!");
+        return;
+    };
+
+    // filtra os items que não serão deletados
+    itemsADeletar.forEach((item) => {
+        metas = metas.filter((meta) => {
+            return meta.value != item
+        })
+    })
+    
+    console.log(itemsADeletar);
+
 }
 
 const start = async () => {
@@ -136,6 +176,10 @@ const start = async () => {
                         value: "abertas" 
                     },
                     {
+                        name: "Deletar metas", 
+                        value: "deletar" 
+                    },
+                    {
                         name: "Sair",
                         value: "sair"
                     }
@@ -159,6 +203,10 @@ const start = async () => {
                 
                 case "abertas":
                     await metasAbertas();
+                    break;
+                
+                case "deletar":
+                    await deletarMetas();
                     break;
                 
                 case "sair":
