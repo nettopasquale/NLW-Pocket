@@ -41,17 +41,17 @@ const listarMeta = async () => {
         message: "Use as ARROW KEYS para mudar de meta, o <SPACE> para marcar/desmarcar e o <ENTER> para finalizar a etapa \n",
         choices: [...metas],
         instructions: false,
-     });
+    });
+    
+     // garante que todas fiquem desmarcadas na chamada de volta!
+     metas.forEach((m) => {
+        m.checked = false;
+    })
     
     if (respostas.length == 0) {
         console.error("Nenhuma meta selecionada!");
         return;
     }
-
-    // garante que todas fiquem desmarcadas na chamada de volta!
-    metas.forEach((m) => {
-        m.checked = false;
-    })
 
     // vai percorrer a lista de respostas
     respostas.forEach((resposta) => {
@@ -83,11 +83,32 @@ const metasRealizadas = async () => {
     }
 
     await select({
-        message: "Metas realizadas",
+        message: `Metas realizadas: ${realizadas.length}`,
         choices: [...realizadas]
     });
 
     console.log(realizadas);
+}
+
+const metasAbertas = async () => {
+    verificaMetasCadastradas();
+
+    // retornar apenas as metas com check de false
+    const abertas = metas.filter((meta) => {
+        return meta.checked != true;
+    });
+
+    if (abertas.length == 0) {
+        console.error("Não existem metas abertas!");
+        return;
+    }
+
+    await select({
+        message: `Metas abertas: ${abertas.length}`,
+        choices: [...abertas]
+    });
+
+    console.log(abertas);
 }
 
 const start = async () => {
@@ -111,6 +132,10 @@ const start = async () => {
                         value: "realizadas" 
                     },
                     {
+                        name: "metas abertas", 
+                        value: "abertas" 
+                    },
+                    {
                         name: "Sair",
                         value: "sair"
                     }
@@ -132,7 +157,12 @@ const start = async () => {
                     await metasRealizadas();
                     break;
                 
+                case "abertas":
+                    await metasAbertas();
+                    break;
+                
                 case "sair":
+                    console.log("Bye Bye :)");
                     return;
                 
             }
