@@ -1,15 +1,31 @@
 const { select, input, checkbox } = require('@inquirer/prompts');
 
+const fs = require("fs").promises; // módulo de file systems nativo do node
+
 let mensagem = "Seja bem vindo, mas venha na maciota";
 
-// objeto estrutural da meta
-let meta = {
-    value: 'Tomar 30L de café',
-    checked: false,
-};
-
 // array para guardar as metas
-let metas = [];
+let metas;
+
+// carregar metas salvas no JSON
+const carregarMetas = async () => {
+    try {
+        //promise para ler o arquivo json das metas salvas
+        const dados = await fs.readFile("metas.json", "utf-8");
+
+        // cria um array com as metas salvas
+        metas = JSON.parse(dados)
+    } catch (error) {
+        metas = [];
+    }
+}
+
+// salvar metas no JSON
+const salvarMetas = async () => {
+
+    // promise de escrita de arquivos em JSON
+    await fs.writeFile("metas.json", JSON.stringify(metas, null, 2))
+}
 
 // cadastra metas
 const cadastrarMeta = async () => {
@@ -69,7 +85,11 @@ const listarMeta = async () => {
 // function paras as metas realizadas
 const metasRealizadas = async () => {
 
-    verificaMetasCadastradas();
+    if (metas.length == 0) {
+        mensagem = "Nenhuma meta cadastrada!";
+        return;
+    }
+    
 
     // retornar apenas as metas com check de true
     const realizadas = metas.filter((meta) => {
@@ -91,7 +111,11 @@ const metasRealizadas = async () => {
 
 // function paras as metas em aberto
 const metasAbertas = async () => {
-    verificaMetasCadastradas();
+    
+    if (metas.length == 0) {
+        mensagem = "Nenhuma meta cadastrada!";
+        return;
+    }
 
     // retornar apenas as metas com check de false
     const abertas = metas.filter((meta) => {
@@ -113,7 +137,12 @@ const metasAbertas = async () => {
 
 // function paras deletar metas
 const deletarMetas = async () => {
-    verificaMetasCadastradas();
+    
+    if (metas.length == 0) {
+        mensagem = "Nenhuma meta cadastrada!";
+        return;
+    }
+    
 
     // Eu quero criar uma nova lista APENAS com metas NÃO marcadas!
     // map serve para criar uma nova lista com valores modificados!
@@ -157,10 +186,13 @@ const mostrarMensagem = () => {
 }
 
 const start = async () => {
+    await carregarMetas();
 
     // Que situação aqui seria falso?
     while (true) {
         mostrarMensagem();
+        await salvarMetas();
+
         // select tem que ser resolvida antes de ser atribuida em opciones
         const opcionies =  await select({
             message: "Menu >", // mensagem simples
@@ -196,7 +228,6 @@ const start = async () => {
             case "cadastrar":
                 // Precisa esperar meta ser cadastrada!
                 await cadastrarMeta();
-                console.log(metas);
                 break;
                 
             case "listar":
